@@ -703,7 +703,7 @@ def Fishroom2TelegramThread(tg: Telegram, bus: MessageBus):
 def init():
     from .db import get_redis
     from .filestore import get_qiniu
-    from .photostore import Imgur, VimCN
+    from .photostore import Imgur, VimCN, SMMS
     redis_client = get_redis()
 
     def photo_store_init():
@@ -713,6 +713,8 @@ def init():
             return Imgur(**options)
         elif provider == "vim-cn":
             return VimCN()
+        elif provider == "sm.ms":
+            return SMMS()
         elif provider == "qiniu":
             return get_qiniu(redis_client, config)
 

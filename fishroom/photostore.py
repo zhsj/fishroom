@@ -88,6 +88,39 @@ class VimCN(BasePhotoStore):
         return r.text.strip()
 
 
+class SMMS(BasePhotoStore):
+
+    url = "https://sm.ms/api/upload"
+
+    def __init__(self, **kwargs):
+        pass
+
+    def upload_image(self, filename=None, filedata=None, **kwargs) -> str:
+        if filedata is None:
+            with open(filename, 'rb') as f:
+                filedata = f.read()
+        files = {"smfile": filedata}
+
+        try:
+            r = requests.post(self.url, files=files, timeout=5)
+        except requests.exceptions.Timeout:
+            logger.error("Timeout uploading to SMMS")
+            return None
+        except:
+            logger.exception("Unknown errror uploading to SMMS")
+            return None
+
+        try:
+            ret = json.loads(r.text)
+        except:
+            return None
+        if ret.get('code', None) != 'success':
+            logger.error("Error: SMMS returned error")
+            return None
+
+        return ret.get('data', {}).get('url', None)
+
+
 if __name__ == "__main__":
     import sys
     imgur = Imgur(sys.argv[1])
